@@ -1,0 +1,15 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+
+<suite name="Selenium Suite" verbose="1" parallel="tests"  thread-count="2">
+    <test name="NavigateToUrl" >
+        <classes>
+            <class name="com.prometheus.selenium.NavigateToURLTest" />
+        </classes>
+    </test>
+
+    <test name="LoginTest">
+        <classes>
+            <class name="com.prometheus.selenium.LoginPageTest"/>
+        </classes>
+    </test>
+</suite>
