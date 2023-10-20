@@ -31,6 +31,17 @@ public class NavigateToURLTest {
                 "Asserting header of the page");
     }
 
+    @Test
+    public void shouldAuthenticate() {
+        this.driver.get("https://the-internet.herokuapp.com/login");
+
+        this.driver.findElement(By.id("username")).sendKeys("tomsmith");
+        this.driver.findElement(By.id("password")).sendKeys("SuperSecretPassword!");
+        this.driver.findElement(By.cssSelector("[type='submit']")).click();
+        Assert.assertEquals("Secure Area", this.driver.findElement(By.tagName("h2")).getText(),
+                "Asserting header of the page");
+    }
+
     @AfterClass
     public void tearDown() {
         this.driver.close();

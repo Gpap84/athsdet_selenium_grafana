@@ -1,7 +1,6 @@
 package com.prometheus.selenium;
 
 import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
 
@@ -22,8 +21,28 @@ public class PrometheusListeners implements ITestListener {
     CollectorRegistry registry = CollectorRegistry.defaultRegistry;
 
     String jobName = "selenium";
-    String metric = "TestPassed";
+    String passed = "TestPassed";
+    String failed = "TestFailed";
+    String skipped = "TestSkipped";
     String help = "metric_help";
+
+    Gauge passedTests = Gauge.build()
+            .name(passed)
+            .help(help)
+            .labelNames(labelKeys.toArray(new String[0]))
+            .register(registry);
+
+    Gauge failedTests = Gauge.build()
+            .name(failed)
+            .help(help)
+            .labelNames(labelKeys.toArray(new String[0]))
+            .register(registry);
+
+    Gauge skippedTests = Gauge.build()
+            .name(skipped)
+            .help(help)
+            .labelNames(labelKeys.toArray(new String[0]))
+            .register(registry);
 
     @Override
     public void onTestStart(ITestResult result) {
@@ -31,12 +50,8 @@ public class PrometheusListeners implements ITestListener {
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        Gauge counter = Gauge.build()
-                .name(metric)
-                .help(help)
-                .labelNames(labelKeys.toArray(new String[0]))
-                .register(registry);
-        counter.labels(labelValues.toArray(new String[0])).inc();
+
+        passedTests.labels(labelValues.toArray(new String[0])).inc();
 
         try {
             client.push(registry, jobName);
@@ -47,10 +62,24 @@ public class PrometheusListeners implements ITestListener {
 
     @Override
     public void onTestFailure(ITestResult result) {
+        failedTests.labels(labelValues.toArray(new String[0])).inc();
+
+        try {
+            client.push(registry, jobName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
+        skippedTests.labels(labelValues.toArray(new String[0])).inc();
+
+        try {
+            client.push(registry, jobName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
